@@ -3,16 +3,16 @@
   "name": "flowbite-react-admin-dashboard",
   "version": "1.0.0",
   "descrption": "flowbite-react admin dashboard",
-  "homepage": "http://niyaz-hasanov.github.io/telebe360admin",
-  
+  "homepage": "https://github.com/themesberg/flowbite-react-admin-dashboard",
+  "bugs": "https://github.com/themesberg/flowbite-react-admin-dashboard/issues",
+  "license": "UNLICENSED",
+  "author": "Conner Davis <cdavis@scu.edu>",
   "repository": {
     "type": "git",
     "url": "https://github.com/themesberg/flowbite-react-admin-dashboard.git"
   },
   "scripts": {
     "build": " vite build",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build",
     "dev": "vite --host",
     "format": "prettier --check --ignore-path .gitignore --write .",
     "lint": "eslint --ignore-path .gitignore .",

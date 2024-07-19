@@ -464,27 +464,7 @@ import {
   };
   
   const TicketsTable: FC<{ tickets: any[]; companies: any[]; token: string }> = function ({ companies, tickets, token }) {
-    const [companyNames, setCompanyNames] = useState<{ [key: number]: string }>({});
   
-    useEffect(() => {
-      const fetchCompanyName = async (id: number) => {
-        try {
-          const response = await fetch(`https://www.telebe360.elxanhuseynli.com/api/companies/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const data = await response.json();
-          setCompanyNames((prev) => ({ ...prev, [id]: data.name }));
-        } catch (error) {
-          console.error("Error fetching company name:", error);
-        }
-      };
-  
-      tickets.forEach((ticket) => {
-        if (ticket.companyId && !companyNames[ticket.companyId]) {
-          fetchCompanyName(ticket.companyId);
-        }
-      });
-    }, [tickets, token, companyNames]);
   
     return (
       <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
@@ -508,7 +488,7 @@ import {
               <Table.Cell>{ticket.startDate}</Table.Cell>
               <Table.Cell>{ticket.endDate}</Table.Cell>
               <Table.Cell>
-                {companyNames[ticket.companyId] || "Loading..."}
+               {ticket.companyName}
               </Table.Cell>
               <Table.Cell>
                 <div className="flex space-x-2">

@@ -420,27 +420,7 @@ import {
   };
   
   const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string  }> = function ({ companies,categories,token,}) {
-      const [categoryNames, setCategoryNames] = useState<{ [key: number]: string }>({});
-      useEffect(() => {
-        const fetchCategoryName = async (id: number) => {
-          try {
-            const response = await fetch(`https://www.telebe360.elxanhuseynli.com/api/categories/${id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await response.json();
-            setCategoryNames((prev) => ({ ...prev, [id]: data.name }));
-          } catch (error) {
-            console.error("Error fetching category name:", error);
-          }
-        };
-    
-        companies.forEach((company) => {
-          if (company.categoryId && !categoryNames[company.categoryId]) {
-            fetchCategoryName(company.categoryId);
-          }
-        });
-      }, [companies, token]);
-    
+     
     return (
       <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <Table.Head>
@@ -461,7 +441,7 @@ import {
                 {company.name}
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              {categoryNames[company.categoryId] || "Loading..."}
+              {company.categoryName}
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                 {company.logo ? (

@@ -5,6 +5,7 @@
       { "src": "/categories", "dest": "/" },
       { "src": "/users/list", "dest": "/" },
       { "src": "/university/list", "dest": "/" },
+         { "src": "/banners/list", "dest": "/" },
       { "src": "/companies/list", "dest": "/" },
       { "src": "/tickets/list", "dest": "/" },
       { "src": "/admins/list", "dest": "/" }

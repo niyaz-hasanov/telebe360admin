@@ -34,7 +34,7 @@ import {
         ?.split("=")[1];
       setToken(tokenFromCookies || "");
   
-      fetch("https://www.telebe360.elxanhuseynli.com/api/tickets", {
+      fetch("http://209.38.40.216:8000/api/v1/tickets", {
         headers: {
           Authorization: `Bearer ${tokenFromCookies}`,
         },
@@ -43,7 +43,7 @@ import {
         .then((data) => setTickets(data))
         .catch((error) => console.error("Error fetching tickets:", error));
   
-      fetch("https://www.telebe360.elxanhuseynli.com/api/companies", {
+      fetch("http://209.38.40.216:8000/api/v1/companies", {
         headers: {
           Authorization: `Bearer ${tokenFromCookies}`,
         },
@@ -159,7 +159,7 @@ import {
       formData.append("endDate", endDate);
       formData.append("companyId", companyId ? companyId.toString() : "");
   
-      fetch("https://www.telebe360.elxanhuseynli.com/api/tickets", {
+      fetch("http://209.38.40.216:8000/api/v1/tickets", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -299,7 +299,7 @@ import {
       formData.append("endDate", endDate);
       formData.append("companyId", companyId ? companyId.toString() : "");
   
-      fetch(`https://www.telebe360.elxanhuseynli.com/api/tickets/${ticket.id}`, {
+      fetch(`http://209.38.40.216:8000/api/v1/tickets/${ticket.id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -421,7 +421,7 @@ import {
     const [isOpen, setOpen] = useState(false);
   
     const handleDeleteTicket = () => {
-      fetch(`https://www.telebe360.elxanhuseynli.com/api/tickets/${ticket.id}`, {
+      fetch(`http://209.38.40.216:8000/api/v1/tickets/${ticket.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -484,11 +484,11 @@ import {
                  <Table.Cell>{ticket.id}</Table.Cell>
               <Table.Cell>{ticket.name}</Table.Cell>
               <Table.Cell>{ticket.count}</Table.Cell>
-              <Table.Cell>{ticket.discountPercent}</Table.Cell>
-              <Table.Cell>{ticket.startDate}</Table.Cell>
-              <Table.Cell>{ticket.endDate}</Table.Cell>
+              <Table.Cell >{ticket.discount}</Table.Cell>
+              <Table.Cell>{ticket.start_time}</Table.Cell>
+              <Table.Cell>{ticket.end_time}</Table.Cell>
               <Table.Cell>
-               {ticket.companyName}
+               {ticket.company.name}
               </Table.Cell>
               <Table.Cell>
                 <div className="flex space-x-2">

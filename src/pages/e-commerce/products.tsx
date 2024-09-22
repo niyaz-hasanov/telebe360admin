@@ -29,7 +29,7 @@ const EcommerceCategoriessPage: FC = function () {
   };
 
   useEffect(() => {
-    fetch("https://www.telebe360.elxanhuseynli.com/api/categories", {
+    fetch("http://209.38.40.216:8000/api/v1/categories/", {
       headers: {
         'Authorization': `Bearer ${getToken()}`,
       }
@@ -149,7 +149,7 @@ const AddCategoryModal: FC<{ getToken: () => string }> = function ({ getToken })
       formData.append('icon', icon);
     }
 
-    fetch("https://www.telebe360.elxanhuseynli.com/api/categories", {
+    fetch("http://209.38.40.216:8000/api/v1/categories", {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${getToken()}`,
@@ -250,8 +250,8 @@ const EditCategoryModal: FC<{ category: any, getToken: () => string }> = functio
       formData.append('icon', icon);
     }
 
-    fetch(`https://www.telebe360.elxanhuseynli.com/api/categories/${category.id}`, {
-      method: "POST",
+    fetch(`http://209.38.40.216:8000/api/v1/categories/${category.id}`, {
+      method: "PUT",
       headers: {
         'Authorization': `Bearer ${getToken()}`,
       },
@@ -342,7 +342,7 @@ const CategoriesTable: FC<{ categories: any[], getToken: () => string }> = funct
 
   const confirmDeleteCategory = () => {
     if (selectedCategory) {
-      fetch(`https://www.telebe360.elxanhuseynli.com/api/categories/${selectedCategory.id}`, {
+      fetch(`http://209.38.40.216:8000/api/v1/categories/${selectedCategory.id}`, {
         method: "DELETE",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -384,7 +384,7 @@ const CategoriesTable: FC<{ categories: any[], getToken: () => string }> = funct
                 {category.slug}
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                <img src={`https://telebe360.elxanhuseynli.com/storage/images/icons/${category.icon}`} alt={category.name} className="h-8 w-8 object-contain dark:bg-white " />
+                <img src={`http://209.38.40.216:8000/uploads/${category.icon_path}`} alt={category.name} className="h-8 w-8 object-contain dark:bg-white " />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-4">

@@ -36,7 +36,7 @@ const EcommerceCategoriesPage: FC = function () {
       ?.split("=")[1];
     setToken(tokenFromCookies || "");
 
-    fetch("https://www.telebe360.elxanhuseynli.com/api/university", {
+    fetch("http://209.38.40.216:8000/api/v1/universities/", {
       headers: {
         Authorization: `Bearer ${tokenFromCookies}`, // Attach token
       },
@@ -139,7 +139,7 @@ const AddCategoryModal: FC<{ token: string }> = function ({ token }) {
   const [name, setName] = useState("");
 
   const handleAddCategory = () => {
-    fetch("https://www.telebe360.elxanhuseynli.com/api/university", {
+    fetch("http://209.38.40.216:8000/api/v1/universities/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -203,7 +203,7 @@ const EditCategoryModal: FC<{ token: string; category: any }> = function ({
 
   const handleEditCategory = () => {
     fetch(
-      `https://www.telebe360.elxanhuseynli.com/api/university/${category.id}`,
+      `http://209.38.40.216:8000/api/v1/universities/${category.id}`,
       {
         method: "PUT",
         headers: {
@@ -266,7 +266,7 @@ const DeleteCategoryModal: FC<{ token: string; categoryId: number }> = function 
   const [isOpen, setOpen] = useState(false);
 
   const handleDeleteCategory = () => {
-    fetch(`https://www.telebe360.elxanhuseynli.com/api/university/${categoryId}`, {
+    fetch(`http://209.38.40.216:8000/api/v1/universities/${categoryId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

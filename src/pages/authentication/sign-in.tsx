@@ -9,16 +9,16 @@ const SignInPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const inFifteenMinutes = new Date(new Date().getTime() + 150 * 60 * 1000);
+  const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 1000);
   const handleLogin = async (e:any) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://telebe360.elxanhuseynli.com/api/login-admin', {
+      const response = await axios.post('http://209.38.40.216:8000/api/v1/auth/sign-in', {
         email: email,
         password: password
       });
-      const token = response.data.token;
+      const token = response.data.access_token;
       Cookies.set('token', token, { expires: inFifteenMinutes, secure: true });
       setError(null);
       setSuccess(true); 

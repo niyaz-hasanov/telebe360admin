@@ -29,7 +29,7 @@ import {
     };
   
     useEffect(() => {
-      fetch("https://www.telebe360.elxanhuseynli.com/api/banners", {
+      fetch("http://209.38.40.216:8000/api/v1/banners", {
         headers: {
           'Authorization': `Bearer ${getToken()}`,
         }
@@ -57,7 +57,7 @@ import {
                 <Breadcrumb.Item>Categories</Breadcrumb.Item>
               </Breadcrumb>
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                All Categories
+                All Banners
               </h1>
             </div>
             <div className="block items-center sm:flex">
@@ -133,12 +133,10 @@ import {
   const AddCategoryModal: FC<{ getToken: () => string }> = function ({ getToken }) {
     const [isOpen, setOpen] = useState(false);
     const [name, setName] = useState('');
-    const [type, setType] = useState(''); // type now a string to handle '0' and '1'
+    const [type, setType] = useState<boolean | null>(null);
     const [imgDesktop, setImgDesktop] = useState<File | null>(null);
     const [imgMobile, setImgMobile] = useState<File | null>(null);
-    const [previewDesktop, setPreviewDesktop] = useState<string | null>(null);
-    const [previewMobile, setPreviewMobile] = useState<string | null>(null);
-  
+    
     const handleFileChangeDesktop = (e: React.ChangeEvent<HTMLInputElement>) => {
       handleFileChange(e, 'desktop');
     };
@@ -152,37 +150,32 @@ import {
         const file = e.target.files[0];
         if (type === 'desktop') {
           setImgDesktop(file);
-  
-          // Preview image
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setPreviewDesktop(reader.result as string);
-          };
-          reader.readAsDataURL(file);
         } else if (type === 'mobile') {
           setImgMobile(file);
-  
-          // Preview image
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setPreviewMobile(reader.result as string);
-          };
-          reader.readAsDataURL(file);
         }
       }
     };
   
     const handleAddCategory = () => {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('type', type === 'Up' ? '0' : '1'); // map 'Up' to '0' and 'Down' to '1'
-  
-      if (imgDesktop && imgMobile) {
-        formData.append('imgDesktop', imgDesktop);
-        formData.append('imgMobile', imgMobile);
+      if (!name || type === null || !imgDesktop || !imgMobile) {
+        console.error("Please fill in all required fields.");
+        return;
       }
   
-      fetch("https://www.telebe360.elxanhuseynli.com/api/banners", {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('type', type.toString()); // Convert boolean to 'true' or 'false'
+  
+      // Directly append files for binary data
+      if (imgDesktop) {
+        formData.append('desktop_img_path', imgDesktop);
+      }
+  
+      if (imgMobile) {
+        formData.append('mobile_img_path', imgMobile);
+      }
+  
+      fetch("http://209.38.40.216:8000/api/v1/banners", {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -191,10 +184,9 @@ import {
       })
         .then(response => response.json())
         .then(data => {
-          console.log("banner added:", data);
-          window.location.reload(); // Reloads the page, consider alternative state management if possible
+          console.log("Banner added:", data);
           setOpen(false);
-          // Refresh categories list or handle the state update
+          window.location.reload()
         })
         .catch(error => console.error("Error adding banner:", error));
     };
@@ -213,7 +205,7 @@ import {
             <form>
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div>
-                  <Label htmlFor="bannerName">banner name</Label>
+                  <Label htmlFor="bannerName">Banner Name</Label>
                   <TextInput
                     id="bannerName"
                     name="bannerName"
@@ -228,23 +220,23 @@ import {
                   <select
                     id="type"
                     name="type"
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
+                    value={type !== null ? (type ? 'true' : 'false') : ''}
+                    onChange={(e) => setType(e.target.value === 'true')}
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:ring-gray-500 dark:focus:border-gray-500"
                   >
                     <option value="">Select type</option>
-                    <option value="Up">Up</option>
-                    <option value="Down">Down</option>
+                    <option value="true">Up</option>
+                    <option value="false">Down</option>
                   </select>
                 </div>
                 <div className="lg:col-span-2">
-                    <Label> Desktop banner</Label>
+                  <Label>Desktop Banner</Label>
                   <div className="flex w-full items-center justify-center">
                     <label className="flex h-32 w-full cursor-pointer flex-col rounded border-2 border-dashed border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700">
-                      {previewDesktop && (
-                        <img src={previewDesktop} alt="Desktop Preview" className="h-32 w-full object-cover" />
+                      {imgDesktop && (
+                        <img src={URL.createObjectURL(imgDesktop)} alt="Desktop Preview" className="h-32 w-full object-cover" />
                       )}
-                      {!previewDesktop && (
+                      {!imgDesktop && (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <HiUpload className="text-4xl text-gray-300" />
                           <p className="py-1 text-sm text-gray-600 dark:text-gray-500">
@@ -260,13 +252,13 @@ import {
                   </div>
                 </div>
                 <div className="lg:col-span-2">
-                <Label>Mobile banner</Label>
+                  <Label>Mobile Banner</Label>
                   <div className="flex w-full items-center justify-center">
                     <label className="flex h-32 w-full cursor-pointer flex-col rounded border-2 border-dashed border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700">
-                      {previewMobile && (
-                        <img src={previewMobile} alt="Mobile Preview" className="h-32 w-full object-cover" />
+                      {imgMobile && (
+                        <img src={URL.createObjectURL(imgMobile)} alt="Mobile Preview" className="h-32 w-full object-cover" />
                       )}
-                      {!previewMobile && (
+                      {!imgMobile && (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <HiUpload className="text-4xl text-gray-300" />
                           <p className="py-1 text-sm text-gray-600 dark:text-gray-500">
@@ -295,20 +287,21 @@ import {
   };
   
   
+  
   const EditCategoryModal: FC<{ category: any, getToken: () => string }> = function ({ category, getToken }) {
     const [isOpen, setOpen] = useState(false);
     const [name, setName] = useState(category.name);
-    const [type, setType] = useState(category.type === '0' ? 'Up' : 'Down'); // map '0' to 'Up' and '1' to 'Down'
+    const [type, setType] = useState(category.type === true ? 'Up' : 'Down'); 
     const [imgDesktop, setImgDesktop] = useState<File | null>(null);
     const [imgMobile, setImgMobile] = useState<File | null>(null);
-    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgDesktop}` : null);
-    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgMobile}` : null);
+    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `http://209.38.40.216:8000/api/v1/banners/${category.desktop_img_path}` : null);
+    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `http://209.38.40.216:8000/api/v1/banners/${category.mobile_img_path}` : null);
   
     useEffect(() => {
       setName(category.name);
-      setType(category.type === '0' ? 'Up' : 'Down');
-      setPreviewDesktop(category.imgDesktop ? `https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgDesktop}` : null);
-      setPreviewMobile(category.imgMobile ? `https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgMobile}` : null);
+      setType(category.type === true ? 'Up' : 'Down');
+      setPreviewDesktop(category.imgDesktop ? `http://209.38.40.216:8000/api/v1/bannerss/${category.desktop_img_path}` : null);
+      setPreviewMobile(category.imgMobile ? `http://209.38.40.216:8000/api/v1/banners/${category.desktop_img_path}` : null);
     }, [category]);
   
     const handleFileChangeDesktop = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,18 +340,18 @@ import {
     const handleEditCategory = () => {
       const formData = new FormData();
       formData.append('name', name);
-      formData.append('type', type === 'Up' ? '0' : '1'); // map 'Up' to '0' and 'Down' to '1'
+      formData.append('type', type === 'Up' ? 'true' : 'false'); // map 'Up' to '0' and 'Down' to '1'
   
       if (imgDesktop) {
-        formData.append('imgDesktop', imgDesktop);
+        formData.append('desktop_img_path', imgDesktop);
       }
   
       if (imgMobile) {
-        formData.append('imgMobile', imgMobile);
+        formData.append('mobile_img_path', imgMobile);
       }
   
-      fetch(`https://www.telebe360.elxanhuseynli.com/api/banners/${category.id}`, {
-        method: "POST",
+      fetch(`http://209.38.40.216:8000/api/v1/banners/${category.id}`, {
+        method: "PUT",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
         },
@@ -482,7 +475,7 @@ import {
   
     const confirmDeleteCategory = () => {
       if (selectedCategory) {
-        fetch(`https://www.telebe360.elxanhuseynli.com/api/banners/${selectedCategory.id}`, {
+        fetch(`http://209.38.40.216:8000/api/v1/banners/${selectedCategory.id}`, {
           method: "DELETE",
           headers: {
             'Authorization': `Bearer ${getToken()}`,
@@ -531,23 +524,23 @@ import {
                 <Table.Cell className="whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                   {category.name}
                 </Table.Cell>
-                <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {category.type === '0' ? 'Up' : 'Down'}
+                <Table.Cell className="whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  {category.type === true ? 'Up' : 'Down'}
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgDesktop}`} 
+                    src={`http://209.38.40.216:8000/uploads/${category.desktop_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgDesktop}`)}
+                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${category.desktop_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgMobile}`} 
+                    src={`http://209.38.40.216:8000/uploads/${category.mobile_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`https://telebe360.elxanhuseynli.com/storage/images/banners/${category.imgMobile}`)}
+                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${category.mobile_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm font-medium">

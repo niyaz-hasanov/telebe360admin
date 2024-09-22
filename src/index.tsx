@@ -11,6 +11,8 @@ import SignUpPage from "./pages/authentication/sign-up";
 import EcommerceProductsPage from "./pages/e-commerce/products";
 import AdminListPage from "./pages/admins/admin_list";
 import UserListPage from "./pages/users/list";
+import UnverifiedPage from './pages/users/unverified_users/list'
+import VerifiedPage from './pages/users/verified_users/list'
 import UniversityListPage from './pages/university/list';
 import CompaniesListPage from './pages/companies/companies';
 import BannerListPage from './pages/banners/banners';
@@ -36,11 +38,14 @@ root.render(
             element={<EcommerceProductsPage />}
           />
           <Route path="/users/list" element={<UserListPage />} />
+          <Route path="/users/verified/list" element={<VerifiedPage />} />
+          <Route path="/users/unverified/list" element={<UnverifiedPage />} />
           <Route path="/university/list" element={<UniversityListPage />} />
           <Route path="/admins/list" element={<AdminListPage />} />
           <Route path="/companies/list" element={<CompaniesListPage />} />
           <Route path="/banners/list" element={<BannerListPage />} />
           <Route path="/tickets/list" element={<TicketsListPage />} />
+          
 
         </Route>
         <Route path="/login" element={<SignInPage />} />

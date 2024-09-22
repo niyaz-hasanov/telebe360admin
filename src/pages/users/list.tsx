@@ -5,7 +5,7 @@ import {
   Label,
   Modal,
   Table,
-  TextInput,
+  TextInput, Select
 } from "flowbite-react";
 import type { FC } from "react";
 import { useState } from "react";
@@ -15,16 +15,27 @@ import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
 interface User {
   id: number;
-  name: string;
+  fname: string;
+  lname: string;
+  birth_date: string;
+  sex: boolean;
+  university_id: string;
   email: string;
   email_verified_at: string | null;
   created_at: string;
 }
 
-const UserListPage: FC = function () {
+const AdminListPage: FC = function () {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
   return (
     <NavbarSidebarLayout isFooter={false}>
       <div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
@@ -37,19 +48,17 @@ const UserListPage: FC = function () {
                   <span className="dark:text-white">Home</span>
                 </div>
               </Breadcrumb.Item>
-              <Breadcrumb.Item href="/users/list">Users</Breadcrumb.Item>
+              <Breadcrumb.Item href="/admin/list">Users</Breadcrumb.Item>
               <Breadcrumb.Item>List</Breadcrumb.Item>
             </Breadcrumb>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-              All users
+              All Users
             </h1>
           </div>
           <div className="sm:flex">
             <div className="mb-3 hidden items-center dark:divide-gray-700 sm:mb-0 sm:flex sm:divide-x sm:divide-gray-100">
               <form className="lg:pr-3">
-                <Label htmlFor="users-search" className="sr-only">
-                  Search
-                </Label>
+                <Label htmlFor="users-search" className="sr-only">Search</Label>
                 <div className="relative mt-1 lg:w-64 xl:w-96">
                   <TextInput
                     id="users-search"
@@ -59,34 +68,35 @@ const UserListPage: FC = function () {
                 </div>
               </form>
               <div className="mt-3 flex space-x-1 pl-0 sm:mt-0 sm:pl-2">
-                <a
-                  href="#"
-                  className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
+                <a href="#" className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                   <span className="sr-only">Configure</span>
                   <HiCog className="text-2xl" />
                 </a>
-                <a
-                  href="#"
-                  className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
+                <a href="#" className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                   <span className="sr-only">Delete</span>
                   <HiTrash className="text-2xl" />
                 </a>
-                <a
-                  href="#"
-                  className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
+                <a href="#" className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                   <span className="sr-only">Purge</span>
                   <HiExclamationCircle className="text-2xl" />
                 </a>
-                <a
-                  href="#"
-                  className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  <span className="sr-only">Settings</span>
-                  <HiDotsVertical className="text-2xl" />
-                </a>
+                <div className="relative">
+                  <button
+                    onClick={toggleDropdown}
+                    className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  >
+                    <span className="sr-only">Settings</span>
+                    <HiDotsVertical className="text-2xl" />
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 dark:bg-gray-800">
+                      <Link to="/users/unverified/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Unverified Users</Link>
+                      <Link to="/users/verified/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Verified Users</Link>
+                      <Link to="/users/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">All Users</Link>
+
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="ml-auto flex items-center space-x-2 sm:space-x-3">
@@ -118,17 +128,40 @@ const UserListPage: FC = function () {
 const AddUserModal: FC = function () {
   const [isOpen, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+    email: "",
+    password: "",
+    fname: "",
+    lname: "",
+    birth_date: "",
+    university_id: "",
+    sex: "true", // Default to 'true' (male) or 'false' (female)
   });
   const [error, setError] = useState<string | null>(null);
+  const [universities, setUniversities] = useState<{ id: string; name: string }[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Fetch universities from the API
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const response = await axios.get("http://209.38.40.216:8000/api/v1/universities", {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
+        setUniversities(response.data); // Assuming response.data is an array of universities
+      } catch (error) {
+        console.error("Error fetching universities:", error);
+      }
+    };
+
+    fetchUniversities();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -136,36 +169,61 @@ const AddUserModal: FC = function () {
     return /\S+@\S+\.\S+/.test(email);
   };
 
+  const isValidPassword = (password: string) => {
+    const passwordRegex = /^[a-zA-Z0-9][a-zA-Z0-9._@#$%^&]{6,38}[a-zA-Z0-9]$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.password) {
-      setError('Please fill all blanks');
+    if (!formData.fname || !formData.lname || !formData.email || !formData.password || !formData.university_id) {
+      setError("Please fill all blanks");
       return;
     }
 
     if (!isValidEmail(formData.email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     } else {
       setError(null);
     }
-        
+
+    if (!isValidPassword(formData.password)) {
+      setError("Password must be between 8 and 40 characters long, start and end with an alphanumeric character, and may contain special characters like ._@#$%^&");
+      return;
+    } else {
+      setError(null);
+    }
+
     try {
-      await axios.post('https://telebe360.elxanhuseynli.com/api/users', formData ,
-      {
-        headers:{ Authorization: `Bearer ${Cookies.get('token')}` }
-      })
-      
-      toast.success('User added successfully');
-      setOpen(false);
+      await axios.post(
+        "http://209.38.40.216:8000/api/v1/admins/users",
+        JSON.stringify({
+          ...formData,
+          sex: formData.sex === 'true', // Convert sex to boolean
+        }),
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success("User added successfully");
       window.location.reload();
-      setFormData({ 
-        name: '',
-        email: '',
-        password: ''
+      setOpen(false);
+      setFormData({
+        email: "",
+        password: "",
+        fname: "",
+        lname: "",
+        birth_date: "",
+        university_id: "",
+        sex: "true", // Reset to default value
       });
     } catch (error) {
-      toast.error('Error adding user');
-      console.error('Error adding user:', error);
+      toast.error("Error adding user");
+      console.error("Error adding user:", error);
     }
   };
 
@@ -174,23 +232,35 @@ const AddUserModal: FC = function () {
       <Button color="primary" onClick={() => setOpen(true)}>
         <div className="flex items-center gap-x-3">
           <HiPlus className="text-xl" />
-          Add user
+          Add
         </div>
       </Button>
       <Modal onClose={() => setOpen(false)} show={isOpen}>
         <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-          <strong>Add new user</strong>
+          <strong>Add new</strong>
         </Modal.Header>
         <Modal.Body>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <Label htmlFor="firstName">Name</Label>
+              <Label htmlFor="fname">First Name</Label>
               <div className="mt-1">
                 <TextInput
-                  id="firstName"
-                  name="name"
-                  placeholder="Bonnie"
-                  value={formData.name}
+                  id="fname"
+                  name="fname"
+                  placeholder="John"
+                  value={formData.fname}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="lname">Last Name</Label>
+              <div className="mt-1">
+                <TextInput
+                  id="lname"
+                  name="lname"
+                  placeholder="Doe"
+                  value={formData.lname}
                   onChange={handleChange}
                 />
               </div>
@@ -221,6 +291,51 @@ const AddUserModal: FC = function () {
                 />
               </div>
             </div>
+            <div>
+              <Label htmlFor="birth_date">Birth Date</Label>
+              <div className="mt-1">
+                <TextInput
+                  id="birth_date"
+                  name="birth_date"
+                  placeholder="YYYY-MM-DD"
+                  type="date"
+                  value={formData.birth_date}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="university_id">University</Label>
+              <div className="mt-1">
+                <Select
+                  id="university_id"
+                  name="university_id"
+                  value={formData.university_id}
+                  onChange={handleChange}
+                >
+                  <option value="">Select a university</option>
+                  {universities.map((university) => (
+                    <option key={university.id} value={university.id}>
+                      {university.name}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="sex">Sex</Label>
+              <div className="mt-1">
+                <Select
+                  id="sex"
+                  name="sex"
+                  value={formData.sex}
+                  onChange={handleChange}
+                >
+                  <option value="true">Male</option>
+                  <option value="false">Female</option>
+                </Select>
+              </div>
+            </div>
           </div>
           {error && <p className="text-red-500">{error}</p>}
         </Modal.Body>
@@ -234,44 +349,79 @@ const AddUserModal: FC = function () {
   );
 };
 
+
 const AllUsersTable: FC = function () {
   const [users, setUsers] = useState<User[]>([]);
+  const [universityNames, setUniversityNames] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    axios.get<User[]>('https://telebe360.elxanhuseynli.com/api/users', {
-      headers: { Authorization: `Bearer ${Cookies.get('token')}` }
-    })
-      .then(response => {
-        setUsers(response.data);
+    // Fetch users
+    axios
+      .get<User[]>('http://209.38.40.216:8000/api/v1/admins/users', {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       })
-      .catch(error => {
+      .then((response) => {
+        setUsers(response.data);
+        response.data.forEach(user => {
+          fetchUniversityName(user.university_id);
+        });
+      })
+      .catch((error) => {
         console.error('Error fetching users:', error);
       });
-  }, []); 
+  }, []);
+
+  // Function to fetch the university name for a given university_id
+  const fetchUniversityName = async (universityId: string) => {
+    if (universityNames[universityId]) return; // If the university name is already fetched, skip
+
+    try {
+      const response = await axios.get<{ name: string }>(`http://209.38.40.216:8000/api/v1/universities/${universityId}`, {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` }
+      });
+      setUniversityNames((prev) => ({
+        ...prev,
+        [universityId]: response.data.name,
+      }));
+    } catch (error) {
+      console.error(`Error fetching university name for ID ${universityId}:`, error);
+    }
+  };
 
   const handleDeleteUser = (userId: number) => {
-    setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+  };
+
+  const handleSex = (sex: boolean): string => {
+    return sex ? 'Male' : 'Female';
   };
 
   return (
     <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
       <Table.Head className="bg-gray-100 dark:bg-gray-700">
-      <Table.HeadCell>ID</Table.HeadCell>
-        <Table.HeadCell>Name</Table.HeadCell>
+        <Table.HeadCell>ID</Table.HeadCell>
+        <Table.HeadCell>First Name</Table.HeadCell>
+        <Table.HeadCell>Last Name</Table.HeadCell>
+        <Table.HeadCell>Birth Date</Table.HeadCell>
+        <Table.HeadCell>Sex</Table.HeadCell>
+        <Table.HeadCell>University</Table.HeadCell>
         <Table.HeadCell>Email</Table.HeadCell>
-        <Table.HeadCell>Email Verified At</Table.HeadCell>
-        <Table.HeadCell>Created At</Table.HeadCell>
         <Table.HeadCell>Actions</Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-        {users.map(user => (
+        {users.map((user) => (
           <Table.Row key={user.id}>
-              <Table.Cell>{user.id}</Table.Cell>
-            <Table.Cell>{user.name}</Table.Cell>
-            <Table.Cell>{user.email}</Table.Cell>
-            <Table.Cell>{user.email_verified_at}</Table.Cell>
-            <Table.Cell>{user.created_at }</Table.Cell>
-            <Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.id}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.fname}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.lname}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.birth_date}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{handleSex(user.sex)}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">
+              {universityNames[user.university_id] || 'Loading...'}
+            </Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.email}</Table.Cell>
+
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">
               <div className="flex items-center gap-x-3 whitespace-nowrap">
                 <EditUserModal user={user} />
                 <DeleteUserModal userId={user.id} onDelete={() => handleDeleteUser(user.id)} />
@@ -286,28 +436,54 @@ const AllUsersTable: FC = function () {
 
 const EditUserModal: FC<{ user: User }> = function ({ user }) {
   const [isOpen, setOpen] = useState(false);
-  const [name, setName] = useState(user.name);
+  const [fname, setFName] = useState(user.fname);
+  const [lname, setLName] = useState(user.lname);
   const [email, setEmail] = useState(user.email);
-  const [password, setPasswordCurrent] = useState('');
+  const [university_id, setUniversityId] = useState<string>(user.university_id.toString()); // Ensure initial value is a string
+  const [birth_date, setBirthDate] = useState(user.birth_date);
+  const [sex, setSex] = useState(user.sex); // true: male, false: female
+
+  const [universities, setUniversities] = useState([]);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch universities on modal open
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const response = await axios.get('http://209.38.40.216:8000/api/v1/universities', {
+          headers: { Authorization: `Bearer ${Cookies.get('token')}` }
+        });
+        setUniversities(response.data);
+      } catch (error) {
+        console.error('Error fetching universities:', error);
+      }
+    };
+
+    if (isOpen) fetchUniversities();
+  }, [isOpen]);
+
   const handleSave = async () => {
-    if (!name || !email || !password) {
+    if (!fname || !email || !password) {
       setError('Please fill all blanks');
       return;
     }
 
     try {
-      await axios.put(`https://telebe360.elxanhuseynli.com/api/users/${user.id}`, {
-        name,
+      await axios.put(`http://209.38.40.216:8000/api/v1/admins/users/${user.id}`, {
+        fname,
+        lname,
         email,
-        password
+        password,
+        university_id,
+        birth_date,
+        sex,
       }, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       toast.success('User updated successfully');
       setOpen(false);
-      window.location.reload();
+      window.location.reload();  // Replace this with setUsers to avoid reloading.
     } catch (error) {
       toast.error('Error updating user');
       console.error('Error updating user:', error);
@@ -319,51 +495,115 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
       <Button color="primary" onClick={() => setOpen(true)}>
         <div className="flex items-center gap-x-2">
           <HiOutlinePencilAlt className="text-lg" />
-    
         </div>
       </Button>
       <Modal onClose={() => setOpen(false)} show={isOpen}>
         <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
-          <strong>Edit user</strong>
+          <strong>Edit</strong>
         </Modal.Header>
         <Modal.Body>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* First Name */}
             <div>
-              <Label htmlFor="name">Name</Label>
-              <div className="mt-1">
-                <TextInput
-                  id="name"
-                  name="name"
-                  placeholder="Lucifer"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
+              <Label htmlFor="fname">First Name</Label>
+              <TextInput
+                id="fname"
+                name="fname"
+                placeholder="Lucifer"
+                value={fname}
+                onChange={(e) => setFName(e.target.value)}
+              />
             </div>
+            {/* Last Name */}
+            <div>
+              <Label htmlFor="lname">Last Name</Label>
+              <TextInput
+                id="lname"
+                name="lname"
+                placeholder="Lucifer"
+                value={lname}
+                onChange={(e) => setLName(e.target.value)}
+              />
+            </div>
+            {/* Email */}
             <div>
               <Label htmlFor="email">Email</Label>
+              <TextInput
+                id="email"
+                name="email"
+                placeholder="example@company.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            {/* Password */}
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <TextInput
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {/* Birth Date */}
+            <div >
+              <Label htmlFor="birth_date">Birth Date</Label>
+              <TextInput
+                id="birth_date"
+                name="birth_date"
+                type="date"
+                value={birth_date}
+                onChange={(e) => setBirthDate(e.target.value)}
+              />
+            </div>
+            {/* University ID */}
+            <div className="mt-1">
+             
+              <Label htmlFor="university_id">University</Label>
               <div className="mt-1">
-                <TextInput
-                  id="email"
-                  name="email"
-                  placeholder="example@company.com"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Select
+                  id="university_id"
+                  name="university_id"
+                  value={university_id}
+                  onChange={(e) => setUniversityId(e.target.value)}
+                >
+                  <option value="">Select University</option>
+                {universities.map((uni) => (
+                  <option key={uni.id} value={uni.id.toString()}> {/* Ensure ID is converted to string */}
+                    {uni.name}
+                  </option>
+                  ))}
+                </Select>
               </div>
             </div>
+            {/* Sex */}
             <div>
-              <Label htmlFor="passwordCurrent">Password</Label>
-              <div className="mt-1">
-                <TextInput
-                  id="passwordCurrent"
-                  name="passwordCurrent"
-                  placeholder="••••••••"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPasswordCurrent(e.target.value)}
-                />
+              <Label>Sex</Label>
+              <div className="flex items-center">
+                <label className="mr-4">
+                  <input
+                    type="radio"
+                    name="sex"
+                    value="true"
+                    checked={sex === true}
+                    onChange={() => setSex(true)}
+                  />
+                  Male
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="sex"
+                    value="false"
+                    checked={sex === false}
+                    onChange={() => setSex(false)}
+                  />
+                  Female
+                </label>
               </div>
             </div>
           </div>
@@ -379,6 +619,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
   );
 };
 
+
 interface DeleteUserModalProps {
   userId: number;
   onDelete: () => void;
@@ -388,11 +629,12 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`https://telebe360.elxanhuseynli.com/api/users/${userId}`,{
-        headers:{ Authorization: `Bearer ${Cookies.get('token')}` }
-      })
+      await axios.delete(`http://209.38.40.216:8000/api/v1/admins/users/${userId}`, {
+        headers: { Authorization: `Bearer ${Cookies.get('token')}` }
+      });
       toast.success('User deleted successfully');
       onDelete();
+      setOpen(false);  // Modal'ı kapatmak için setOpen(false) çağırıyoruz.
     } catch (error) {
       toast.error('Error deleting user');
       console.error('Error deleting user:', error);
@@ -414,7 +656,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
           <div className="flex flex-col items-center gap-y-6 text-center">
             <HiOutlineExclamationCircle className="text-7xl text-red-500" />
             <p className="text-xl text-gray-500">
-              Are you sure you want to delete this user?
+              Are you sure you want to delete this?
             </p>
             <div className="flex items-center gap-x-3">
               <Button color="failure" onClick={handleDelete}>
@@ -430,6 +672,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
     </>
   );
 };
+
 
 export const Pagination: FC = function () {
   return (
@@ -480,4 +723,4 @@ export const Pagination: FC = function () {
   );
 };
 
-export default UserListPage;
+export default AdminListPage;

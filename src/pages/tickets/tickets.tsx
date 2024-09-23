@@ -148,28 +148,50 @@ import {
     const [discountPercent, setDiscountPercent] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [companyId, setCompanyId] = useState<number | null>(null);
+    const [companyId, setCompanyId] = useState<string | null>(null);
+    const [categoryId, setCategoryId] = useState<string | null>(null);
+    const [categories, setCategories] = useState<any[]>([]);
+  
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://209.38.40.216:8000/api/v1/categories");
+        const data = await response.json();
+        setCategories(data); // Assuming the API returns an array of categories
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+  
+    useEffect(() => {
+      if (isOpen) {
+        fetchCategories();
+      }
+    }, [isOpen]);
   
     const handleAddTicket = () => {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("count", count);
-      formData.append("discountPercent", discountPercent);
-      formData.append("startDate", startDate);
-      formData.append("endDate", endDate);
-      formData.append("companyId", companyId ? companyId.toString() : "");
+      const formData = {
+        company_id: companyId || "",
+        category_id: categoryId || "",
+        name,
+        discount: discountPercent,
+        count: parseInt(count, 10) || 0,
+        start_time: startDate,
+        end_time: endDate,
+      };
   
       fetch("http://209.38.40.216:8000/api/v1/tickets", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: JSON.stringify(formData),
       })
         .then((response) => response.json())
         .then((data) => {
           window.location.reload();
           setOpen(false);
+          // Optionally, handle successful response
         })
         .catch((error) => console.error("Error adding ticket:", error));
     };
@@ -248,13 +270,30 @@ import {
                     id="ticketCompanyId"
                     name="ticketCompanyId"
                     className="dark:bg-gray-800 dark:text-white mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                    value={companyId ? companyId.toString() : ""}
-                    onChange={(e) => setCompanyId(parseInt(e.target.value))}
+                    value={companyId || ""}
+                    onChange={(e) => setCompanyId(e.target.value)}
                   >
                     <option value="">Select a company</option>
                     {companies.map((company) => (
                       <option key={company.id} value={company.id}>
                         {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="ticketCategoryId">Category</Label>
+                  <select
+                    id="ticketCategoryId"
+                    name="ticketCategoryId"
+                    className="dark:bg-gray-800 dark:text-white mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    value={categoryId || ""}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
@@ -277,6 +316,8 @@ import {
     );
   };
   
+  
+  
   const EditTicketModal: FC<{ token: string; companies: any[]; ticket: any }> = function ({
     token,
     companies,
@@ -285,30 +326,79 @@ import {
     const [isOpen, setOpen] = useState(false);
     const [name, setName] = useState(ticket.name);
     const [count, setCount] = useState(ticket.count);
-    const [discountPercent, setDiscountPercent] = useState(ticket.discountPercent);
-    const [startDate, setStartDate] = useState(ticket.startDate);
-    const [endDate, setEndDate] = useState(ticket.endDate);
-    const [companyId, setCompanyId] = useState(ticket.companyId);
+    const [discountPercent, setDiscountPercent] = useState(ticket.discount);
+    const [startDate, setStartDate] = useState(ticket.start_time);
+    const [endDate, setEndDate] = useState(ticket.end_time);
+    const [companyId, setCompanyId] = useState(ticket.company_id);
+    const [categoryId, setCategoryId] = useState(ticket.category_id);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<any>(null);
+    const [selectedCompany, setSelectedCompany] = useState<any>(null);
+  
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://209.38.40.216:8000/api/v1/categories");
+        const data = await response.json();
+        setCategories(data);
+        // Fetch the selected category
+        if (ticket.category_id) {
+          const categoryResponse = await fetch(`http://209.38.40.216:8000/api/v1/categories/${ticket.category_id}`);
+          const categoryData = await categoryResponse.json();
+          setSelectedCategory(categoryData);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+  
+    const fetchCompany = async (companyId: string) => {
+      try {
+        const response = await fetch(`http://209.38.40.216:8000/api/v1/companies/${companyId}`);
+        const data = await response.json();
+        setSelectedCompany(data);
+      } catch (error) {
+        console.error("Error fetching company:", error);
+      }
+    };
+  
+    useEffect(() => {
+      if (isOpen) {
+        fetchCategories();
+        // Set initial values based on the ticket
+        setName(ticket.name);
+        setCount(ticket.count);
+        setDiscountPercent(ticket.discount);
+        setStartDate(ticket.start_time);
+        setEndDate(ticket.end_time);
+        setCompanyId(ticket.company_id);
+        setCategoryId(ticket.category_id);
+        
+        // Fetch the selected company
+        fetchCompany(ticket.company_id);
+      }
+    }, [isOpen, ticket]);
   
     const handleEditTicket = () => {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("count", count);
-      formData.append("discountPercent", discountPercent);
-      formData.append("startDate", startDate);
-      formData.append("endDate", endDate);
-      formData.append("companyId", companyId ? companyId.toString() : "");
+      const updatedFields: any = {};
+  
+      if (name !== ticket.name) updatedFields.name = name;
+      if (count !== ticket.count) updatedFields.count = parseInt(count, 10) || 0;
+      if (discountPercent !== ticket.discount) updatedFields.discount = discountPercent;
+      if (startDate !== ticket.start_time) updatedFields.start_time = startDate;
+      if (endDate !== ticket.end_time) updatedFields.end_time = endDate;
+      if (companyId !== ticket.company_id) updatedFields.company_id = companyId;
+      if (categoryId !== ticket.category_id) updatedFields.category_id = categoryId;
   
       fetch(`http://209.38.40.216:8000/api/v1/tickets/${ticket.id}`, {
-        method: "POST",
+        method: "PATCH", // Use PATCH for partial updates
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: JSON.stringify(updatedFields),
       })
         .then((response) => response.json())
         .then((data) => {
-          window.location.reload();
           setOpen(false);
         })
         .catch((error) => console.error("Error editing ticket:", error));
@@ -317,8 +407,7 @@ import {
     return (
       <>
         <Button color="primary" onClick={() => setOpen(!isOpen)}>
-          <HiPencilAlt className=" text-sm" />
-       
+          <HiPencilAlt className="text-sm" />
         </Button>
         <Modal onClose={() => setOpen(false)} show={isOpen}>
           <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
@@ -388,13 +477,30 @@ import {
                     id="ticketCompanyId"
                     name="ticketCompanyId"
                     className="mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white"
-                    value={companyId ? companyId.toString() : ""}
-                    onChange={(e) => setCompanyId(parseInt(e.target.value))}
+                    value={companyId || ""}
+                    onChange={(e) => setCompanyId(e.target.value)}
                   >
                     <option value="">Select a company</option>
                     {companies.map((company) => (
                       <option key={company.id} value={company.id}>
                         {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="ticketCategoryId">Category</Label>
+                  <select
+                    id="ticketCategoryId"
+                    name="ticketCategoryId"
+                    className="mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white"
+                    value={categoryId || ""}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
@@ -416,6 +522,7 @@ import {
       </>
     );
   };
+  
   
   const DeleteTicketModal: FC<{ token: string; ticket: any }> = function ({ token, ticket }) {
     const [isOpen, setOpen] = useState(false);

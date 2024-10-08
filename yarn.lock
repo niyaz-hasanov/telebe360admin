@@ -359,11 +359,6 @@
   dependencies:
     "@floating-ui/dom" "^1.1.0"
 
-"@hotwired/turbo@^8.0.6":
-  version "8.0.6"
-  resolved "https://registry.npmjs.org/@hotwired/turbo/-/turbo-8.0.6.tgz"
-  integrity sha512-mwZRfwcJ4yatUnW5tcCY9NDvo0kjuuLQF/y8pXigHhS+c/JY/ccNluVyuERR9Sraqx0qdpenkO3pNeSWz1mE3w==
-
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.8.tgz"

@@ -333,7 +333,6 @@ import {
     const [categoryId, setCategoryId] = useState(ticket.category_id);
     const [categories, setCategories] = useState<any[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<any>(null);
-    const [selectedCompany, setSelectedCompany] = useState<any>(null);
   
     const fetchCategories = async () => {
       try {
@@ -350,17 +349,7 @@ import {
         console.error("Error fetching categories:", error);
       }
     };
-  
-    const fetchCompany = async (companyId: string) => {
-      try {
-        const response = await fetch(`http://209.38.40.216:8000/api/v1/companies/${companyId}`);
-        const data = await response.json();
-        setSelectedCompany(data);
-      } catch (error) {
-        console.error("Error fetching company:", error);
-      }
-    };
-  
+   
     useEffect(() => {
       if (isOpen) {
         fetchCategories();
@@ -371,10 +360,10 @@ import {
         setStartDate(ticket.start_time);
         setEndDate(ticket.end_time);
         setCompanyId(ticket.company_id);
-        setCategoryId(ticket.category_id);
+        setCategoryId(ticket.category.id);
         
         // Fetch the selected company
-        fetchCompany(ticket.company_id);
+
       }
     }, [isOpen, ticket]);
   
@@ -390,7 +379,7 @@ import {
       if (categoryId !== ticket.category_id) updatedFields.category_id = categoryId;
   
       fetch(`http://209.38.40.216:8000/api/v1/tickets/${ticket.id}`, {
-        method: "PATCH", // Use PATCH for partial updates
+        method: "PUT", // Use PATCH for partial updates
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -400,6 +389,7 @@ import {
         .then((response) => response.json())
         .then((data) => {
           setOpen(false);
+          window.location.reload()
         })
         .catch((error) => console.error("Error editing ticket:", error));
     };
@@ -471,23 +461,7 @@ import {
                     onChange={(e) => setEndDate(e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="ticketCompanyId">Company</Label>
-                  <select
-                    id="ticketCompanyId"
-                    name="ticketCompanyId"
-                    className="mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white"
-                    value={companyId || ""}
-                    onChange={(e) => setCompanyId(e.target.value)}
-                  >
-                    <option value="">Select a company</option>
-                    {companies.map((company) => (
-                      <option key={company.id} value={company.id}>
-                        {company.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+               
                 <div>
                   <Label htmlFor="ticketCategoryId">Category</Label>
                   <select
@@ -582,6 +556,7 @@ import {
           <Table.HeadCell>Discount Percent</Table.HeadCell>
           <Table.HeadCell>Start Date</Table.HeadCell>
           <Table.HeadCell>End Date</Table.HeadCell>
+          <Table.HeadCell>Category</Table.HeadCell>
           <Table.HeadCell>Company</Table.HeadCell>
           <Table.HeadCell>Actions</Table.HeadCell>
         </Table.Head>
@@ -594,6 +569,9 @@ import {
               <Table.Cell >{ticket.discount}</Table.Cell>
               <Table.Cell>{ticket.start_time}</Table.Cell>
               <Table.Cell>{ticket.end_time}</Table.Cell>
+              <Table.Cell>
+               {ticket.category.name}
+              </Table.Cell>
               <Table.Cell>
                {ticket.company.name}
               </Table.Cell>

@@ -211,7 +211,7 @@ const AddCompanyModal: FC<{ token: string; categories: any[] }> = function ({ to
                 <select
                   id="companyCategory"
                   name="companyCategory"
-                  className="mt-1 dark:bg-gray-800 dark:text-white"
+                  className="mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white"
                   onChange={(e) => setCategoryId(e.target.value)} // categoryId artık string olacak
                 >
                   <option value="">Select Category</option>
@@ -281,13 +281,12 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
   const [isOpen, setOpen] = useState(false);
   const [name, setName] = useState(company.name);
   const [logo, setLogo] = useState<File | null>(null);
-  const [categoryId, setCategoryId] = useState<number | undefined>(company.category?.id);
+  const [categoryId, setCategoryId] = useState(company?.category?.id || '');
   const [description, setDescription] = useState(company.description);
   const [address, setAddress] = useState(company.address);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Şirket bilgileri değiştiğinde state'i güncelle
   useEffect(() => {
     setName(company.name);
     setCategoryId(company.category?.id);
@@ -296,16 +295,18 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
     setLogo(null); // Logo sıfırlanabilir veya mevcut logoyu korumak için değiştirilebilir
     setError(null); // Önceki hataları temizle
   }, [company]);
-
+  const handleCategoryChange = (e) => {
+    setCategoryId(e.target.value);
+  };
   const handleEditCompany = async () => {
-    // Önceki hataları temizle
-    setError(null);
-
+    setError(null); // Önceki hataları temizle
+   
+    const updatedCompany = {
+      ...company,
+      category_id: categoryId,
+    };
     // Kategori seçimini doğrula
-    if (categoryId === undefined || categoryId === null) {
-      setError("Kategori seçmeniz gerekiyor.");
-      return;
-    }
+
 
     // Şirket adını doğrula
     if (!name.trim()) {
@@ -318,7 +319,7 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
     const formData = new FormData();
     formData.append("name", name);
     if (logo) formData.append("logo", logo);
-    formData.append("categoryId", categoryId.toString());
+    formData.append("category_id", categoryId.toString()); // categoryId'yi string olarak gönderiyoruz
     formData.append("description", description);
     formData.append("address", address);
 
@@ -327,7 +328,6 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-          // FormData kullanırken 'Content-Type' ayarlamamalısınız
         },
         body: formData,
       });
@@ -337,7 +337,6 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
         throw new Error(errorData.message || "Şirketi düzenlerken bir hata oluştu.");
       }
 
-      // İsteğe bağlı: Sayfayı yeniden yüklemek yerine parent component'ten güncelleme yapabilirsiniz
       window.location.reload();
       setOpen(false);
     } catch (err) {
@@ -392,26 +391,11 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
               {/* Kategori Seçimi */}
               <div>
                 <Label htmlFor="companyCategory">Category</Label>
-                <select
-                  id="companyCategory"
-                  name="companyCategory"
-                  className="mt-1 dark:bg-gray-800 dark:text-white"
-                  value={categoryId !== undefined ? categoryId : ""}
-                  onChange={(e) => {
-                    const selectedValue = parseInt(e.target.value, 10);
-                    if (!isNaN(selectedValue)) {
-                      setCategoryId(selectedValue);
-                    } else {
-                      setCategoryId(undefined);
-                    }
-                  }}
-                >
-                  <option value="" disabled>
-                    Kategori seçiniz
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id} className="dark:bg-gray-800 dark:text-white">
-                      {category.name}
+                <select value={categoryId} onChange={handleCategoryChange} className="mt-1 w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 dark:bg-gray-800 dark:text-white">
+                  <option value="">Kategori Seçiniz</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
@@ -459,7 +443,6 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
     </>
   );
 };
-
 const DeleteCompanyModal: FC<{ token: string; companyId: number }> = function ({ token, companyId }) {
   const [isOpen, setOpen] = useState(false);
 
@@ -503,7 +486,7 @@ const DeleteCompanyModal: FC<{ token: string; companyId: number }> = function ({
   );
 };
 
-const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string  }> = function ({ companies,categories,token,}) {
+const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string }> = function ({ companies, categories, token, }) {
   return (
     <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
       <Table.Head>

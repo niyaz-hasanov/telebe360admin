@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
+import {APIURL} from '../../utils/constants'
 interface User {
   id: number;
   fname: string;
@@ -163,7 +163,7 @@ const AddUserModal: FC = function () {
 
     try {
       await axios.post(
-        "http://209.38.40.216:8000/api/v1/admins",  
+        `${APIURL}admins`,  
         JSON.stringify(formData),
         {
           headers: {
@@ -272,7 +272,7 @@ const AllUsersTable: FC = function () {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    axios.get<User[]>('http://209.38.40.216:8000/api/v1/admins', {
+    axios.get<User[]>(`${APIURL}admins`, {
       headers: { Authorization: `Bearer ${Cookies.get('token')}` }
     })
       .then(response => {
@@ -333,7 +333,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
     }
 
     try {
-      await axios.put(`http://209.38.40.216:8000/api/v1/admins/${user.id}`, {
+      await axios.put(`${APIURL}admins/${user.id}`, {
         fname,
         lname,
         email,
@@ -436,7 +436,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://209.38.40.216:8000/api/v1/admins/admins/${userId}`, {
+      await axios.delete(`${APIURL}admins/${userId}`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       toast.success('User deleted successfully');

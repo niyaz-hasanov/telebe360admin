@@ -16,7 +16,7 @@ import {
   import axios from 'axios';
   import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom'; 
-  
+  import { APIURL,MAINURL } from "../../../utils/constants";
   
   interface User {
     id: number;
@@ -140,7 +140,7 @@ import { Link } from 'react-router-dom';
     useEffect(() => {
       // Fetch users
       axios
-        .get<User[]>('http://209.38.40.216:8000/api/v1/admins/users/verified', {
+        .get<User[]>(`${APIURL}admins/users/verified`, {
           headers: { Authorization: `Bearer ${Cookies.get('token')}` }
         })
         .then((response) => {
@@ -159,7 +159,7 @@ import { Link } from 'react-router-dom';
       if (universityNames[universityId]) return; 
   
       try {
-        const response = await axios.get<{ name: string }>(`http://209.38.40.216:8000/api/v1/universities/${universityId}`, {
+        const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}`, {
           headers: { Authorization: `Bearer ${Cookies.get('token')}` }
         });
         setUniversityNames((prev) => ({
@@ -206,18 +206,18 @@ import { Link } from 'react-router-dom';
              
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`http://209.38.40.216:8000/uploads/${user. profile_img_path}`} 
+                    src={`${MAINURL}uploads/${user. profile_img_path}`} 
                     alt={user.email} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${user. profile_img_path}`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${user. profile_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`http://209.38.40.216:8000/uploads/${user.student_card_img_path}`} 
+                    src={`${MAINURL}uploads/${user.student_card_img_path}`} 
                     alt={user.email} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${user.student_card_img_path}`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${user.student_card_img_path}`)}
                   />
                 </Table.Cell>
               

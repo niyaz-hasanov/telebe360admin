@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from 'axios';
 import { Button, Card, Label, TextInput } from "flowbite-react";
 import Cookies from 'js-cookie';
-
+import {APIURL} from '../../utils/constants'
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +14,7 @@ const SignInPage = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://209.38.40.216:8000/api/v1/auth/sign-in', {
+      const response = await axios.post(`${APIURL}auth/sign-in`, {
         email: email,
         password: password
       });

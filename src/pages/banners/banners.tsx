@@ -20,7 +20,7 @@ import {
   } from "react-icons/hi";
   import NavbarSidebarLayout from "../../layouts/navbar-sidebar";
   import { Pagination } from "../users/list";
-  
+  import {APIURL, MAINURL} from '../../utils/constants'
   const EcommerceCategoriessPage: FC = function () {
     const [categories, setCategories] = useState([]);
   
@@ -29,7 +29,7 @@ import {
     };
   
     useEffect(() => {
-      fetch("http://209.38.40.216:8000/api/v1/banners", {
+      fetch(`${APIURL}banners`, {
         headers: {
           'Authorization': `Bearer ${getToken()}`,
         }
@@ -175,7 +175,7 @@ import {
         formData.append('mobile_img_path', imgMobile);
       }
   
-      fetch("http://209.38.40.216:8000/api/v1/banners", {
+      fetch(`${APIURL}banners`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -294,14 +294,14 @@ import {
     const [type, setType] = useState(category.type === true ? 'Up' : 'Down'); 
     const [imgDesktop, setImgDesktop] = useState<File | null>(null);
     const [imgMobile, setImgMobile] = useState<File | null>(null);
-    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `http://209.38.40.216:8000/api/v1/banners/${category.desktop_img_path}` : null);
-    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `http://209.38.40.216:8000/api/v1/banners/${category.mobile_img_path}` : null);
+    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}` : null);
+    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `${APIURL}banners/${category.mobile_img_path}` : null);
   
     useEffect(() => {
       setName(category.name);
       setType(category.type === true ? 'Up' : 'Down');
-      setPreviewDesktop(category.imgDesktop ? `http://209.38.40.216:8000/api/v1/bannerss/${category.desktop_img_path}` : null);
-      setPreviewMobile(category.imgMobile ? `http://209.38.40.216:8000/api/v1/banners/${category.desktop_img_path}` : null);
+      setPreviewDesktop(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}` : null);
+      setPreviewMobile(category.imgMobile ? `${APIURL}banners/${category.desktop_img_path}` : null);
     }, [category]);
   
     const handleFileChangeDesktop = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -350,7 +350,7 @@ import {
         formData.append('mobile_img_path', imgMobile);
       }
   
-      fetch(`http://209.38.40.216:8000/api/v1/banners/${category.id}`, {
+      fetch(`${APIURL}banners/${category.id}`, {
         method: "PUT",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -475,7 +475,7 @@ import {
   
     const confirmDeleteCategory = () => {
       if (selectedCategory) {
-        fetch(`http://209.38.40.216:8000/api/v1/banners/${selectedCategory.id}`, {
+        fetch(`${APIURL}banners/${selectedCategory.id}`, {
           method: "DELETE",
           headers: {
             'Authorization': `Bearer ${getToken()}`,
@@ -529,18 +529,18 @@ import {
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`http://209.38.40.216:8000/uploads/${category.desktop_img_path}`} 
+                    src={`${MAINURL}uploads/${category.desktop_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${category.desktop_img_path}`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.desktop_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`http://209.38.40.216:8000/uploads/${category.mobile_img_path}`} 
+                    src={`${MAINURL}uploads/${category.mobile_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`http://209.38.40.216:8000/uploads/${category.mobile_img_path}`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.mobile_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm font-medium">

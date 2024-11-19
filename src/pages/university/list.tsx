@@ -23,7 +23,7 @@ import {
 } from "react-icons/hi";
 import NavbarSidebarLayout from "../../layouts/navbar-sidebar";
 import { Pagination } from "../users/list";
-
+import {APIURL,MAINURL} from '../../utils/constants'
 const EcommerceCategoriesPage: FC = function () {
   const [categories, setCategories] = useState([]);
   const [token, setToken] = useState(""); // Store the token
@@ -36,7 +36,7 @@ const EcommerceCategoriesPage: FC = function () {
       ?.split("=")[1];
     setToken(tokenFromCookies || "");
 
-    fetch("http://209.38.40.216:8000/api/v1/universities/", {
+    fetch(`${APIURL}universities/`, {
       headers: {
         Authorization: `Bearer ${tokenFromCookies}`, // Attach token
       },
@@ -139,7 +139,7 @@ const AddCategoryModal: FC<{ token: string }> = function ({ token }) {
   const [name, setName] = useState("");
 
   const handleAddCategory = () => {
-    fetch("http://209.38.40.216:8000/api/v1/universities/", {
+    fetch(`${APIURL}universities/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -203,7 +203,7 @@ const EditCategoryModal: FC<{ token: string; category: any }> = function ({
 
   const handleEditCategory = () => {
     fetch(
-      `http://209.38.40.216:8000/api/v1/universities/${category.id}`,
+      `${APIURL}universities/${category.id}`,
       {
         method: "PUT",
         headers: {
@@ -266,7 +266,7 @@ const DeleteCategoryModal: FC<{ token: string; categoryId: number }> = function 
   const [isOpen, setOpen] = useState(false);
 
   const handleDeleteCategory = () => {
-    fetch(`http://209.38.40.216:8000/api/v1/universities/${categoryId}`, {
+    fetch(`${APIURL}universities/${categoryId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

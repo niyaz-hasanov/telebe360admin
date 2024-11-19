@@ -21,6 +21,7 @@ import {
 } from "react-icons/hi";
 import NavbarSidebarLayout from "../../layouts/navbar-sidebar";
 import { Pagination } from "../users/list";
+import {APIURL,MAINURL} from '../../utils/constants'
 
 const EcommerceCompaniesPage: FC = function () {
   const [companies, setCompanies] = useState([]);
@@ -34,7 +35,7 @@ const EcommerceCompaniesPage: FC = function () {
       ?.split("=")[1];
     setToken(tokenFromCookies || "");
 
-    fetch("http://209.38.40.216:8000/api/v1/companies/", {
+    fetch(`${APIURL}companies/`, {
       headers: {
         Authorization: `Bearer ${tokenFromCookies}`,
       },
@@ -43,7 +44,7 @@ const EcommerceCompaniesPage: FC = function () {
       .then((data) => setCompanies(data))
       .catch((error) => console.error("Error fetching companies:", error));
 
-    fetch("http://209.38.40.216:8000/api/v1/categories", {
+    fetch(`${APIURL}categories`, {
       headers: {
         Authorization: `Bearer ${tokenFromCookies}`,
       },
@@ -157,7 +158,7 @@ const AddCompanyModal: FC<{ token: string; categories: any[] }> = function ({ to
     formData.append("description", about); // 'about' alanı 'description' olarak gönderilecek
     formData.append("address", address);
 
-    fetch("http://209.38.40.216:8000/api/v1/companies/", {
+    fetch(`${APIURL}companies/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -324,7 +325,7 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
     formData.append("address", address);
 
     try {
-      const response = await fetch(`http://209.38.40.216:8000/api/v1/companies/${company.id}`, {
+      const response = await fetch(`${APIURL}companies/${company.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -447,7 +448,7 @@ const DeleteCompanyModal: FC<{ token: string; companyId: number }> = function ({
   const [isOpen, setOpen] = useState(false);
 
   const handleDeleteCompany = () => {
-    fetch(`http://209.38.40.216:8000/api/v1/companies/${companyId}`, {
+    fetch(`${APIURL}companies/${companyId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -511,7 +512,7 @@ const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string }>
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
               {company.logo_path ? (
-                <img src={`http://209.38.40.216:8000/uploads/${company.logo_path}`} alt={company.name} className=" h-8 w-8 object-contain rounded-full" />
+                <img src={`${MAINURL}uploads/${company.logo_path}`} alt={company.name} className=" h-8 w-8 object-contain rounded-full" />
               ) : (
                 "No Logo"
               )}

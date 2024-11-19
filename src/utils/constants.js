@@ -1,2 +1,2 @@
-export const MAINURL = 'http://209.38.40.216:8000/';
-export const APIURL = 'http://209.38.40.216:8000/api/v1/';
+export const MAINURL = 'https://api.telebe360.com/';
+export const APIURL = 'https://api.telebe360.com/api/v1/';

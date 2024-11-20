@@ -10,24 +10,20 @@ const SignInPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 1000);
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e:any) => {
     e.preventDefault();
-  
-    const endpoint = `${APIURL}auth/sign-in/`.endsWith('/') 
-      ? `${APIURL}auth/sign-in/` 
-      : `${APIURL}auth/sign-in/`;
-  
+
     try {
-      const response = await axios.post(endpoint, {
+      const response = await axios.post(`${APIURL}auth/sign-in/`, {
         email: email,
-        password: password,
+        password: password
       });
-  
       const token = response.data.access_token;
       Cookies.set('token', token, { expires: inFifteenMinutes, secure: true });
       setError(null);
-      setSuccess(true);
-  
+      setSuccess(true); 
+
+      
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);

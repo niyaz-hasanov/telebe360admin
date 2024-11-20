@@ -143,7 +143,7 @@ const AddUserModal: FC = function () {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        const response = await axios.get(`${APIURL}universities`, {
+        const response = await axios.get(`${APIURL}universities/`, {
           headers: {
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
@@ -196,7 +196,7 @@ const AddUserModal: FC = function () {
 
     try {
       await axios.post(
-        `${APIURL}admins/users`,
+        `${APIURL}admins/users/`,
         JSON.stringify({
           ...formData,
           sex: formData.sex === 'true', // Convert sex to boolean
@@ -357,7 +357,7 @@ const AllUsersTable: FC = function () {
   useEffect(() => {
     // Fetch users
     axios
-      .get<User[]>(`${APIURL}admins/users`, {
+      .get<User[]>(`${APIURL}admins/users/`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       })
       .then((response) => {
@@ -376,7 +376,7 @@ const AllUsersTable: FC = function () {
     if (universityNames[universityId]) return; // If the university name is already fetched, skip
 
     try {
-      const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}`, {
+      const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}/`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       setUniversityNames((prev) => ({
@@ -451,7 +451,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        const response = await axios.get(`${APIURL}universities`, {
+        const response = await axios.get(`${APIURL}universities/`, {
           headers: { Authorization: `Bearer ${Cookies.get('token')}` }
         });
         setUniversities(response.data);
@@ -470,7 +470,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
     }
 
     try {
-      await axios.put(`${APIURL}admins/users/${user.id}`, {
+      await axios.put(`${APIURL}admins/users/${user.id}/`, {
         fname,
         lname,
         email,
@@ -629,7 +629,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${APIURL}admins/users/${userId}`, {
+      await axios.delete(`${APIURL}admins/users/${userId}/`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       toast.success('User deleted successfully');

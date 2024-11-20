@@ -14,7 +14,7 @@ const SignInPage = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${APIURL}auth/sign-in`, {
+      const response = await axios.post(`${APIURL}auth/sign-in/`, {
         email: email,
         password: password
       });

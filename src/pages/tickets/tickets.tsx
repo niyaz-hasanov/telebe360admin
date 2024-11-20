@@ -34,7 +34,7 @@ import {
         ?.split("=")[1];
       setToken(tokenFromCookies || "");
   
-      fetch(`${APIURL}tickets`, {
+      fetch(`${APIURL}tickets/`, {
         headers: {
           Authorization: `Bearer ${tokenFromCookies}`,
         },
@@ -43,7 +43,7 @@ import {
         .then((data) => setTickets(data))
         .catch((error) => console.error("Error fetching tickets:", error));
   
-      fetch(`${APIURL}companies`, {
+      fetch(`${APIURL}companies/`, {
         headers: {
           Authorization: `Bearer ${tokenFromCookies}`,
         },
@@ -154,7 +154,7 @@ import {
   
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${APIURL}categories`);
+        const response = await fetch(`${APIURL}categories/`);
         const data = await response.json();
         setCategories(data); // Assuming the API returns an array of categories
       } catch (error) {
@@ -179,7 +179,7 @@ import {
         end_time: endDate,
       };
   
-      fetch(`${APIURL}tickets`, {
+      fetch(`${APIURL}tickets/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -336,12 +336,12 @@ import {
   
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${APIURL}categories`);
+        const response = await fetch(`${APIURL}categories/`);
         const data = await response.json();
         setCategories(data);
         // Fetch the selected category
         if (ticket.category_id) {
-          const categoryResponse = await fetch(`${APIURL}categories/${ticket.category_id}`);
+          const categoryResponse = await fetch(`${APIURL}categories/${ticket.category_id}/`);
           const categoryData = await categoryResponse.json();
           setSelectedCategory(categoryData);
         }
@@ -378,7 +378,7 @@ import {
       if (companyId !== ticket.company_id) updatedFields.company_id = companyId;
       if (categoryId !== ticket.category_id) updatedFields.category_id = categoryId;
   
-      fetch(`${APIURL}tickets/${ticket.id}`, {
+      fetch(`${APIURL}tickets/${ticket.id}/`, {
         method: "PUT", // Use PATCH for partial updates
         headers: {
           "Content-Type": "application/json",
@@ -502,7 +502,7 @@ import {
     const [isOpen, setOpen] = useState(false);
   
     const handleDeleteTicket = () => {
-      fetch(`${APIURL}tickets/${ticket.id}`, {
+      fetch(`${APIURL}tickets/${ticket.id}/`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -149,7 +149,7 @@ const AddCategoryModal: FC<{ getToken: () => string }> = function ({ getToken })
       formData.append('icon', icon);
     }
 
-    fetch(`${APIURL}categories`, {
+    fetch(`${APIURL}categories/`, {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${getToken()}`,
@@ -250,7 +250,7 @@ const EditCategoryModal: FC<{ category: any, getToken: () => string }> = functio
       formData.append('icon', icon);
     }
 
-    fetch(`${APIURL}categories/${category.id}`, {
+    fetch(`${APIURL}categories/${category.id}/`, {
       method: "PUT",
       headers: {
         'Authorization': `Bearer ${getToken()}`,
@@ -342,7 +342,7 @@ const CategoriesTable: FC<{ categories: any[], getToken: () => string }> = funct
 
   const confirmDeleteCategory = () => {
     if (selectedCategory) {
-      fetch(`${APIURL}categories/${selectedCategory.id}`, {
+      fetch(`${APIURL}categories/${selectedCategory.id}/`, {
         method: "DELETE",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -384,7 +384,7 @@ const CategoriesTable: FC<{ categories: any[], getToken: () => string }> = funct
                 {category.slug}
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                <img src={`${MAINURL}uploads/${category.icon_path}`} alt={category.name} className="h-8 w-8 object-contain dark:bg-white " />
+                <img src={`${MAINURL}uploads/${category.icon_path}/`} alt={category.name} className="h-8 w-8 object-contain dark:bg-white " />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm font-medium">
                 <div className="flex space-x-4">

@@ -341,7 +341,7 @@ import {
         setCategories(data);
         // Fetch the selected category
         if (ticket.category_id) {
-          const categoryResponse = await fetch(`${APIURL}categories/${ticket.category_id}/`);
+          const categoryResponse = await fetch(`${APIURL}categories/${ticket.category_id}`);
           const categoryData = await categoryResponse.json();
           setSelectedCategory(categoryData);
         }
@@ -378,7 +378,7 @@ import {
       if (companyId !== ticket.company_id) updatedFields.company_id = companyId;
       if (categoryId !== ticket.category_id) updatedFields.category_id = categoryId;
   
-      fetch(`${APIURL}tickets/${ticket.id}/`, {
+      fetch(`${APIURL}tickets/${ticket.id}`, {
         method: "PUT", // Use PATCH for partial updates
         headers: {
           "Content-Type": "application/json",
@@ -502,7 +502,7 @@ import {
     const [isOpen, setOpen] = useState(false);
   
     const handleDeleteTicket = () => {
-      fetch(`${APIURL}tickets/${ticket.id}/`, {
+      fetch(`${APIURL}tickets/${ticket.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

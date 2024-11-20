@@ -294,14 +294,14 @@ import {
     const [type, setType] = useState(category.type === true ? 'Up' : 'Down'); 
     const [imgDesktop, setImgDesktop] = useState<File | null>(null);
     const [imgMobile, setImgMobile] = useState<File | null>(null);
-    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}/` : null);
-    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `${APIURL}banners/${category.mobile_img_path}/` : null);
+    const [previewDesktop, setPreviewDesktop] = useState<string | null>(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}` : null);
+    const [previewMobile, setPreviewMobile] = useState<string | null>(category.imgMobile ? `${APIURL}banners/${category.mobile_img_path}` : null);
   
     useEffect(() => {
       setName(category.name);
       setType(category.type === true ? 'Up' : 'Down');
-      setPreviewDesktop(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}/` : null);
-      setPreviewMobile(category.imgMobile ? `${APIURL}banners/${category.desktop_img_path}/` : null);
+      setPreviewDesktop(category.imgDesktop ? `${APIURL}banners/${category.desktop_img_path}` : null);
+      setPreviewMobile(category.imgMobile ? `${APIURL}banners/${category.desktop_img_path}` : null);
     }, [category]);
   
     const handleFileChangeDesktop = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -350,7 +350,7 @@ import {
         formData.append('mobile_img_path', imgMobile);
       }
   
-      fetch(`${APIURL}banners/${category.id}/`, {
+      fetch(`${APIURL}banners/${category.id}`, {
         method: "PUT",
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -475,7 +475,7 @@ import {
   
     const confirmDeleteCategory = () => {
       if (selectedCategory) {
-        fetch(`${APIURL}banners/${selectedCategory.id}/`, {
+        fetch(`${APIURL}banners/${selectedCategory.id}`, {
           method: "DELETE",
           headers: {
             'Authorization': `Bearer ${getToken()}`,
@@ -529,18 +529,18 @@ import {
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`${MAINURL}uploads/${category.desktop_img_path}/`} 
+                    src={`${MAINURL}uploads/${category.desktop_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.desktop_img_path}/`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.desktop_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <img 
-                    src={`${MAINURL}uploads/${category.mobile_img_path}/`} 
+                    src={`${MAINURL}uploads/${category.mobile_img_path}`} 
                     alt={category.name} 
                     className="h-16 w-16 object-contain dark:bg-white cursor-pointer" 
-                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.mobile_img_path}/`)}
+                    onClick={() => handleImageClick(`${MAINURL}uploads/${category.mobile_img_path}`)}
                   />
                 </Table.Cell>
                 <Table.Cell className="whitespace-nowrap text-sm font-medium">

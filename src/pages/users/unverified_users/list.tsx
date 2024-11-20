@@ -140,7 +140,7 @@ const AllUsersTable: FC = function () {
   useEffect(() => {
     // Fetch users
     axios
-      .get<User[]>(`${APIURL}admins/users/not_verified/`, {
+      .get<User[]>(`${APIURL}admins/users/not_verified`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       })
       .then((response) => {
@@ -159,7 +159,7 @@ const AllUsersTable: FC = function () {
     if (universityNames[universityId]) return;
 
     try {
-      const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}/`, {
+      const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       setUniversityNames((prev) => ({
@@ -207,19 +207,19 @@ const AllUsersTable: FC = function () {
 
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                 <img
-                  src={`${MAINURL}uploads/${user.profile_img_path}/`}
+                  src={`${MAINURL}uploads/${user.profile_img_path}`}
                   alt={user.fname}
                   className="h-16 w-16 object-contain dark:bg-white cursor-pointer"
-                  onClick={() => handleImageClick(`${APIURL}uploads/${user.profile_img_path}/`)}
+                  onClick={() => handleImageClick(`${APIURL}uploads/${user.profile_img_path}`)}
                 />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                 <img
-                  src={`${MAINURL}uploads/${user.student_card_img_path}/`}
+                  src={`${MAINURL}uploads/${user.student_card_img_path}`}
 
                   alt={user.fname}
                   className="h-16 w-16 object-contain dark:bg-white cursor-pointer"
-                  onClick={() => handleImageClick(`${APIURL}uploads/${user.student_card_img_path}/`)}
+                  onClick={() => handleImageClick(`${APIURL}uploads/${user.student_card_img_path}`)}
                 />
               </Table.Cell>
               <Table.Cell>{handleSex(user.sex)}</Table.Cell>
@@ -271,7 +271,7 @@ const VerifyUserModal: FC<VerifyUserModalProps> = function ({ userId, onVerify }
   const handleVerify = async () => {
     try {
       await axios.patch(
-        `${APIURL}admins/users/verify/${userId}/`,
+        `${APIURL}admins/users/verify/${userId}`,
         {},
         {
           headers: { Authorization: `Bearer ${Cookies.get('token')}` }

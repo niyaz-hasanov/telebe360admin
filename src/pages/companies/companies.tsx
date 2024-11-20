@@ -325,7 +325,7 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
     formData.append("address", address);
 
     try {
-      const response = await fetch(`${APIURL}companies/${company.id}/`, {
+      const response = await fetch(`${APIURL}companies/${company.id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -448,7 +448,7 @@ const DeleteCompanyModal: FC<{ token: string; companyId: number }> = function ({
   const [isOpen, setOpen] = useState(false);
 
   const handleDeleteCompany = () => {
-    fetch(`${APIURL}companies/${companyId}/`, {
+    fetch(`${APIURL}companies/${companyId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -512,7 +512,7 @@ const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string }>
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
               {company.logo_path ? (
-                <img src={`${MAINURL}uploads/${company.logo_path}/`} alt={company.name} className=" h-8 w-8 object-contain rounded-full" />
+                <img src={`${MAINURL}uploads/${company.logo_path}`} alt={company.name} className=" h-8 w-8 object-contain rounded-full" />
               ) : (
                 "No Logo"
               )}

@@ -203,7 +203,7 @@ const EditCategoryModal: FC<{ token: string; category: any }> = function ({
 
   const handleEditCategory = () => {
     fetch(
-      `${APIURL}universities/${category.id}/`,
+      `${APIURL}universities/${category.id}`,
       {
         method: "PUT",
         headers: {
@@ -266,7 +266,7 @@ const DeleteCategoryModal: FC<{ token: string; categoryId: number }> = function 
   const [isOpen, setOpen] = useState(false);
 
   const handleDeleteCategory = () => {
-    fetch(`${APIURL}universities/${categoryId}/`, {
+    fetch(`${APIURL}universities/${categoryId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

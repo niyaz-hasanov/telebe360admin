@@ -18,6 +18,8 @@ import CompaniesListPage from './pages/companies/companies';
 import BannerListPage from './pages/banners/banners';
 import TicketsListPage from './pages/tickets/tickets';
 import PrivateRoutes from "./utils/PrivateRoutes";
+import PromosListPage from "./pages/promos/promos";
+
 const container = document.getElementById("root");
 
 if (!container) {
@@ -29,6 +31,7 @@ const root = createRoot(container);
 root.render(
 
   <Flowbite theme={{ theme }}>
+
     <BrowserRouter>
       <Routes>
         <Route element={<PrivateRoutes/>}>
@@ -45,12 +48,15 @@ root.render(
           <Route path="/companies/list" element={<CompaniesListPage />} />
           <Route path="/banners/list" element={<BannerListPage />} />
           <Route path="/tickets/list" element={<TicketsListPage />} />
+          <Route path="/promos/list" element={<PromosListPage />} />
+
           
 
         </Route>
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<SignUpPage />} />
       </Routes>
+      
     </BrowserRouter>
   </Flowbite>
 

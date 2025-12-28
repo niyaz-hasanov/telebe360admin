@@ -11,6 +11,7 @@ import {
   HiOfficeBuilding,
   HiTable,
   HiTicket,
+  HiGift,
 } from "react-icons/hi";
 
 interface ExampleSidebarProps {
@@ -147,6 +148,17 @@ const ExampleSidebar: FC<ExampleSidebarProps> = ({ isSidebarOpen, setSidebarOpen
                     }
                   >
                     Ticket list
+                  </Sidebar.Item>
+                     <Sidebar.Item
+                    href="/promos/list"
+                    icon={HiGift}
+                    className={
+                      "/promos/list" === currentPage
+                        ? "bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    }
+                  >
+                    Promocode list
                   </Sidebar.Item>
                 </Sidebar.ItemGroup>
               </Sidebar.Items>

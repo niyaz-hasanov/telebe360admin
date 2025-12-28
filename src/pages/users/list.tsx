@@ -16,12 +16,14 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { APIURL,MAINURL } from "../../utils/constants";
+import { APIURL, MAINURL } from "../../utils/constants";
+
 interface User {
   id: number;
   fname: string;
   lname: string;
   birth_date: string;
+  coins: string;
   sex: boolean;
   university_id: string;
   email: string;
@@ -93,13 +95,13 @@ const AdminListPage: FC = function () {
                       <Link to="/users/unverified/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Unverified Users</Link>
                       <Link to="/users/verified/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Verified Users</Link>
                       <Link to="/users/list" className="block px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">All Users</Link>
-
                     </div>
                   )}
                 </div>
               </div>
             </div>
             <div className="ml-auto flex items-center space-x-2 sm:space-x-3">
+              <ImportUserModal />
               <AddUserModal />
               <Button color="gray">
                 <div className="flex items-center gap-x-3">
@@ -134,12 +136,11 @@ const AddUserModal: FC = function () {
     lname: "",
     birth_date: "",
     university_id: "",
-    sex: "true", // Default to 'true' (male) or 'false' (female)
+    sex: "true",
   });
   const [error, setError] = useState<string | null>(null);
   const [universities, setUniversities] = useState<{ id: string; name: string }[]>([]);
 
-  // Fetch universities from the API
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
@@ -148,7 +149,7 @@ const AddUserModal: FC = function () {
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
         });
-        setUniversities(response.data); // Assuming response.data is an array of universities
+        setUniversities(response.data);
       } catch (error) {
         console.error("Error fetching universities:", error);
       }
@@ -175,7 +176,7 @@ const AddUserModal: FC = function () {
   };
 
   const handleSubmit = async () => {
-    if (!formData.fname || !formData.lname || !formData.email || !formData.password || !formData.university_id) {
+    if (!formData.fname || !formData.lname || !formData.email || !formData.university_id) {
       setError("Please fill all blanks");
       return;
     }
@@ -199,7 +200,7 @@ const AddUserModal: FC = function () {
         `${APIURL}admins/users`,
         JSON.stringify({
           ...formData,
-          sex: formData.sex === 'true', // Convert sex to boolean
+          sex: formData.sex === 'true',
         }),
         {
           headers: {
@@ -219,7 +220,7 @@ const AddUserModal: FC = function () {
         lname: "",
         birth_date: "",
         university_id: "",
-        sex: "true", // Reset to default value
+        sex: "true",
       });
     } catch (error) {
       toast.error("Error adding user");
@@ -349,13 +350,159 @@ const AddUserModal: FC = function () {
   );
 };
 
+const ImportUserModal: FC = function () {
+  const [isOpen, setOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [serverMessage, setServerMessage] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setFile(f);
+    setError(null);
+    setServerMessage("");
+  };
+
+  const handleSubmit = async () => {
+    if (!file) {
+      setError("Lütfen bir Excel dosyası (.xlsx / .xls) seçin.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      setServerMessage("");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post(
+        `${APIURL}admins/users/import/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+
+      const message: string | undefined = res?.data?.message;
+      setServerMessage(message ?? "Import completed.");
+    } catch (err: any) {
+      const apiMsg: string | undefined =
+        err?.response?.data?.message ||
+        err?.response?.data?.detail ||
+        err?.message;
+      setError(apiMsg ? String(apiMsg) : "Error importing users");
+      console.error("Error importing users:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleClear = () => {
+    setFile(null);
+    setError(null);
+    setServerMessage("");
+  };
+
+  return (
+    <>
+      <Button color="primary" onClick={() => setOpen(true)}>
+        <div className="flex items-center gap-x-3">
+          <HiPlus className="text-xl" />
+          Import
+        </div>
+      </Button>
+
+      <Modal onClose={() => setOpen(false)} show={isOpen}>
+        <Modal.Header className="border-b border-gray-200 !p-6 dark:border-gray-700">
+          <strong>Add .xlsx file</strong>
+        </Modal.Header>
+
+        <Modal.Body>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Label htmlFor="user-import-file">Excel File</Label>
+              <input
+                id="user-import-file"
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileChange}
+                disabled={submitting}
+                className="mt-1 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-gray-200 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:file:bg-gray-600 dark:hover:file:bg-gray-500 disabled:cursor-not-allowed"
+              />
+              {file && (
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  File: <span className="font-medium">{file.name}</span>
+                </p>
+              )}
+            </div>
+
+            {submitting && (
+              <div className="sm:col-span-2">
+                <div className="mb-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
+                    <path d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" strokeWidth="4" fill="none" />
+                  </svg>
+                  Uploading...
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="h-2 w-full animate-pulse rounded-full bg-primary-600/80 dark:bg-primary-500/80" />
+                </div>
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  File is uploading, please wait
+                </p>
+              </div>
+            )}
+
+            {serverMessage && (
+              <div className="sm:col-span-2">
+                <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm text-green-800 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-200">
+                  {serverMessage}
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="sm:col-span-2">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200">
+                  {error}
+                </div>
+              </div>
+            )}
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button color="gray" onClick={handleClear} disabled={submitting}>
+              Clean
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button color="gray" onClick={() => setOpen(false)} disabled={submitting}>
+              Close
+            </Button>
+            <Button color="primary" onClick={handleSubmit} disabled={submitting || !file}>
+              {submitting ? "Uploading..." : "Import User"}
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
 
 const AllUsersTable: FC = function () {
   const [users, setUsers] = useState<User[]>([]);
   const [universityNames, setUniversityNames] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    // Fetch users
     axios
       .get<User[]>(`${APIURL}admins/users`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
@@ -371,9 +518,8 @@ const AllUsersTable: FC = function () {
       });
   }, []);
 
-  // Function to fetch the university name for a given university_id
   const fetchUniversityName = async (universityId: string) => {
-    if (universityNames[universityId]) return; // If the university name is already fetched, skip
+    if (universityNames[universityId]) return;
 
     try {
       const response = await axios.get<{ name: string }>(`${APIURL}universities/${universityId}`, {
@@ -404,6 +550,7 @@ const AllUsersTable: FC = function () {
         <Table.HeadCell>Last Name</Table.HeadCell>
         <Table.HeadCell>Birth Date</Table.HeadCell>
         <Table.HeadCell>Sex</Table.HeadCell>
+        <Table.HeadCell>Coins</Table.HeadCell>
         <Table.HeadCell>University</Table.HeadCell>
         <Table.HeadCell>Email</Table.HeadCell>
         <Table.HeadCell>Actions</Table.HeadCell>
@@ -416,6 +563,8 @@ const AllUsersTable: FC = function () {
             <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.lname}</Table.Cell>
             <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.birth_date}</Table.Cell>
             <Table.Cell className=" font-medium text-gray-900 dark:text-white">{handleSex(user.sex)}</Table.Cell>
+            <Table.Cell className=" font-medium text-gray-900 dark:text-white">{user.coins}</Table.Cell>
+
             <Table.Cell className=" font-medium text-gray-900 dark:text-white">
               {universityNames[user.university_id] || 'Loading...'}
             </Table.Cell>
@@ -438,16 +587,17 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
   const [isOpen, setOpen] = useState(false);
   const [fname, setFName] = useState(user.fname);
   const [lname, setLName] = useState(user.lname);
-  const [email, setEmail] = useState(user.email);
-  const [university_id, setUniversityId] = useState<string>(user.university_id.toString()); // Ensure initial value is a string
-  const [birth_date, setBirthDate] = useState(user.birth_date);
-  const [sex, setSex] = useState(user.sex); // true: male, false: female
+  const [coins, setCoins] = useState(user.coins);
 
-  const [universities, setUniversities] = useState([]);
+  const [email, setEmail] = useState(user.email);
+  const [university_id, setUniversityId] = useState<string>(user.university_id.toString());
+  const [birth_date, setBirthDate] = useState(user.birth_date);
+  const [sex, setSex] = useState(user.sex);
+
+  const [universities, setUniversities] = useState<any[]>([]);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch universities on modal open
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
@@ -463,27 +613,45 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
     if (isOpen) fetchUniversities();
   }, [isOpen]);
 
+  // ✅ boş field-ları payload-dan silən helper
+  const stripEmpty = (obj: Record<string, any>) => {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => {
+        if (v === undefined || v === null) return false;
+        if (typeof v === "string" && v.trim() === "") return false;
+        return true;
+      })
+    );
+  };
+
   const handleSave = async () => {
-    if (!fname || !email || !password) {
+    if (!fname?.trim() || !email?.trim()) {
       setError('Please fill all blanks');
       return;
     }
 
+    setError(null);
+
+    // ✅ burada request payload-u boşları çıxararaq yığırıq
+    const payload = stripEmpty({
+      fname: fname.trim(),
+      lname: lname?.trim(),
+      email: email.trim(),
+      coins: coins,                 // boşdursa silinəcək
+      password: password,           // boşdursa silinəcək (problem həll olur)
+      university_id: university_id, // "" olarsa silinəcək
+      birth_date: birth_date,       // "" olarsa silinəcək
+      sex: sex,                     // boolean qalacaq
+    });
+
     try {
-      await axios.put(`${APIURL}admins/users/${user.id}`, {
-        fname,
-        lname,
-        email,
-        password,
-        university_id,
-        birth_date,
-        sex,
-      }, {
+      await axios.put(`${APIURL}admins/users/${user.id}`, payload, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
+
       toast.success('User updated successfully');
       setOpen(false);
-      window.location.reload();  // Replace this with setUsers to avoid reloading.
+      window.location.reload();
     } catch (error) {
       toast.error('Error updating user');
       console.error('Error updating user:', error);
@@ -503,7 +671,6 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
         </Modal.Header>
         <Modal.Body>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* First Name */}
             <div>
               <Label htmlFor="fname">First Name</Label>
               <TextInput
@@ -514,7 +681,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                 onChange={(e) => setFName(e.target.value)}
               />
             </div>
-            {/* Last Name */}
+
             <div>
               <Label htmlFor="lname">Last Name</Label>
               <TextInput
@@ -525,7 +692,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                 onChange={(e) => setLName(e.target.value)}
               />
             </div>
-            {/* Email */}
+
             <div>
               <Label htmlFor="email">Email</Label>
               <TextInput
@@ -537,7 +704,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            {/* Password */}
+
             <div>
               <Label htmlFor="password">Password</Label>
               <TextInput
@@ -548,9 +715,12 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Leave empty to keep current password.
+              </p>
             </div>
-            {/* Birth Date */}
-            <div >
+
+            <div>
               <Label htmlFor="birth_date">Birth Date</Label>
               <TextInput
                 id="birth_date"
@@ -560,9 +730,8 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                 onChange={(e) => setBirthDate(e.target.value)}
               />
             </div>
-            {/* University ID */}
+
             <div className="mt-1">
-             
               <Label htmlFor="university_id">University</Label>
               <div className="mt-1">
                 <Select
@@ -572,15 +741,15 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
                   onChange={(e) => setUniversityId(e.target.value)}
                 >
                   <option value="">Select University</option>
-                {universities.map((uni) => (
-                  <option key={uni.id} value={uni.id.toString()}> {/* Ensure ID is converted to string */}
-                    {uni.name}
-                  </option>
+                  {universities.map((uni) => (
+                    <option key={uni.id} value={uni.id.toString()}>
+                      {uni.name}
+                    </option>
                   ))}
                 </Select>
               </div>
             </div>
-            {/* Sex */}
+
             <div>
               <Label>Sex</Label>
               <div className="flex items-center">
@@ -607,7 +776,8 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
               </div>
             </div>
           </div>
-          {error && <p className="text-red-500">{error}</p>}
+
+          {error && <p className="text-red-500 mt-3">{error}</p>}
         </Modal.Body>
         <Modal.Footer>
           <Button color="primary" onClick={handleSave}>
@@ -618,7 +788,6 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
     </>
   );
 };
-
 
 interface DeleteUserModalProps {
   userId: number;
@@ -634,7 +803,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
       });
       toast.success('User deleted successfully');
       onDelete();
-      setOpen(false);  // Modal'ı kapatmak için setOpen(false) çağırıyoruz.
+      setOpen(false);
     } catch (error) {
       toast.error('Error deleting user');
       console.error('Error deleting user:', error);
@@ -672,7 +841,6 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
     </>
   );
 };
-
 
 export const Pagination: FC = function () {
   return (

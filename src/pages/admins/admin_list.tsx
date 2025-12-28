@@ -333,7 +333,7 @@ const EditUserModal: FC<{ user: User }> = function ({ user }) {
     }
 
     try {
-      await axios.put(`${APIURL}admins/${user.id}/`, {
+      await axios.put(`${APIURL}admins/${user.id}`, {
         fname,
         lname,
         email,
@@ -436,7 +436,7 @@ const DeleteUserModal: FC<DeleteUserModalProps> = function ({ userId, onDelete }
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${APIURL}admins/${userId}/`, {
+      await axios.delete(`${APIURL}/admins/admins/${userId}`, {
         headers: { Authorization: `Bearer ${Cookies.get('token')}` }
       });
       toast.success('User deleted successfully');

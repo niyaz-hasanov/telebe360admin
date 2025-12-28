@@ -422,7 +422,7 @@ const EditCompanyModal: FC<EditCompanyModalProps> = ({ token, company, categorie
                   id="companyAddress"
                   name="companyAddress"
                   placeholder="Company Address"
-                  className="mt-1"
+                  className="mt-1 "
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
@@ -495,13 +495,13 @@ const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string }>
         <Table.HeadCell>Company Name</Table.HeadCell>
         <Table.HeadCell>Category</Table.HeadCell>
         <Table.HeadCell>Logo</Table.HeadCell>
-        <Table.HeadCell>Address</Table.HeadCell>
+        <Table.HeadCell >Address</Table.HeadCell>
         <Table.HeadCell>Action</Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y divide-gray-200 dark:divide-gray-700">
         {companies.map((company) => (
           <Table.Row key={company.id} className="bg-white dark:bg-gray-800 ">
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+            <Table.Cell className="whitespace-wrap font-medium text-gray-900 dark:text-white">
               {company.id}
             </Table.Cell>
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white ">
@@ -517,7 +517,7 @@ const CompaniesTable: FC<{ companies: any[]; categories: any[]; token: string }>
                 "No Logo"
               )}
             </Table.Cell>
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+            <Table.Cell className="whitespace-wrap font-medium text-gray-900 dark:text-white">
               {company.address}
             </Table.Cell>
             <Table.Cell>

@@ -210,7 +210,7 @@ const AllUsersTable: FC = function () {
                   src={`${MAINURL}uploads/${user.profile_img_path}`}
                   alt={user.fname}
                   className="h-16 w-16 object-contain dark:bg-white cursor-pointer"
-                  onClick={() => handleImageClick(`${APIURL}uploads/${user.profile_img_path}`)}
+                  onClick={() => handleImageClick(`${MAINURL}uploads/${user.profile_img_path}`)}
                 />
               </Table.Cell>
               <Table.Cell className="whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -219,7 +219,7 @@ const AllUsersTable: FC = function () {
 
                   alt={user.fname}
                   className="h-16 w-16 object-contain dark:bg-white cursor-pointer"
-                  onClick={() => handleImageClick(`${APIURL}uploads/${user.student_card_img_path}`)}
+                  onClick={() => handleImageClick(`${MAINURL}uploads/${user.student_card_img_path}`)}
                 />
               </Table.Cell>
               <Table.Cell>{handleSex(user.sex)}</Table.Cell>

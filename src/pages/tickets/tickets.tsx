@@ -145,6 +145,8 @@ import {
     const [isOpen, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [count, setCount] = useState("");
+    const [price, setPrice] = useState("");
+    
     const [discountPercent, setDiscountPercent] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -174,6 +176,8 @@ import {
         category_id: categoryId || "",
         name,
         discount: discountPercent,
+        price,
+
         count: parseInt(count, 10) || 0,
         start_time: startDate,
         end_time: endDate,
@@ -240,6 +244,17 @@ import {
                     className="mt-1"
                     value={discountPercent}
                     onChange={(e) => setDiscountPercent(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="tickePrice">Price</Label>
+                  <TextInput
+                    id="ticketPrice"
+                    name="ticketPrice"
+                    placeholder="ticketPrice"
+                    className="mt-1"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>
                 <div>
@@ -326,6 +341,8 @@ import {
     const [isOpen, setOpen] = useState(false);
     const [name, setName] = useState(ticket.name);
     const [count, setCount] = useState(ticket.count);
+    const [price, setPrice] = useState(ticket.price);
+
     const [discountPercent, setDiscountPercent] = useState(ticket.discount);
     const [startDate, setStartDate] = useState(ticket.start_time);
     const [endDate, setEndDate] = useState(ticket.end_time);
@@ -356,6 +373,8 @@ import {
         // Set initial values based on the ticket
         setName(ticket.name);
         setCount(ticket.count);
+        setPrice(ticket.price);
+
         setDiscountPercent(ticket.discount);
         setStartDate(ticket.start_time);
         setEndDate(ticket.end_time);
@@ -372,6 +391,8 @@ import {
   
       if (name !== ticket.name) updatedFields.name = name;
       if (count !== ticket.count) updatedFields.count = parseInt(count, 10) || 0;
+      if (price !== ticket.price) updatedFields.price = parseInt(price, 10) || 0;
+
       if (discountPercent !== ticket.discount) updatedFields.discount = discountPercent;
       if (startDate !== ticket.start_time) updatedFields.start_time = startDate;
       if (endDate !== ticket.end_time) updatedFields.end_time = endDate;
@@ -437,6 +458,17 @@ import {
                     className="mt-1"
                     value={discountPercent}
                     onChange={(e) => setDiscountPercent(e.target.value)}
+                  />
+                </div>
+                   <div>
+                  <Label htmlFor="ticketPrice">Price</Label>
+                  <TextInput
+                    id="ticketPrice"
+                    name="ticketPrice"
+                    placeholder="ticketPrice"
+                    className="mt-1"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>
                 <div>
@@ -554,6 +586,7 @@ import {
           <Table.HeadCell>Name</Table.HeadCell>
           <Table.HeadCell>Count</Table.HeadCell>
           <Table.HeadCell>Discount Percent</Table.HeadCell>
+          <Table.HeadCell>Price</Table.HeadCell>
           <Table.HeadCell>Start Date</Table.HeadCell>
           <Table.HeadCell>End Date</Table.HeadCell>
           <Table.HeadCell>Category</Table.HeadCell>
@@ -567,6 +600,8 @@ import {
               <Table.Cell>{ticket.name}</Table.Cell>
               <Table.Cell>{ticket.count}</Table.Cell>
               <Table.Cell >{ticket.discount}</Table.Cell>
+              <Table.Cell >{ticket.price}</Table.Cell>
+
               <Table.Cell>{ticket.start_time}</Table.Cell>
               <Table.Cell>{ticket.end_time}</Table.Cell>
               <Table.Cell>
